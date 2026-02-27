@@ -33,15 +33,22 @@
         .countdown-gradient {
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
         }
-        #summerOverlay {
+        #summerOverlay, #nightOverlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: linear-gradient(to bottom, #fde68a, #fbbf24);
             z-index: 10000;
             align-items: center;
             justify-content: center;
             text-align: center;
+        }
+        #summerOverlay {
+            background: linear-gradient(to bottom, #fde68a, #fbbf24);
+        }
+        #nightOverlay {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            color: white;
         }
         .nav-link.active {
             background-color: #3b82f6;
@@ -86,12 +93,28 @@
         <img src="https://upload.wikimedia.org/wikipedia/en/2/25/Majurocoopschoollogo.png" alt="School Logo" id="schoolLogo">
     </div>
 
+    <!-- Summer Overlay -->
     <div id="summerOverlay">
         <div class="p-8">
             <h1 class="text-6xl md:text-9xl mb-6">🏝️</h1>
             <h2 class="text-4xl md:text-6xl font-black text-amber-900 mb-4 italic uppercase">The time is up!</h2>
             <p class="text-2xl md:text-4xl font-bold text-amber-800 uppercase tracking-widest">Summer is here!</p>
             <p class="mt-8 text-amber-700 font-medium">Cleaning duties are officially over.</p>
+        </div>
+    </div>
+
+    <!-- Night Overlay -->
+    <div id="nightOverlay">
+        <div class="p-8">
+            <h1 class="text-5xl md:text-7xl mb-6">🌙</h1>
+            <h2 class="text-3xl md:text-5xl font-black mb-4 italic uppercase">Wait for next schedule</h2>
+            <p class="text-xl md:text-2xl font-bold text-slate-400 uppercase tracking-widest mb-8">System is updating for Monday</p>
+            
+            <div class="bg-white/10 p-6 rounded-2xl border border-white/20 inline-block">
+                <p class="text-xs uppercase tracking-[0.2em] text-blue-400 mb-2">Next Rotation Starts In:</p>
+                <div id="nextMondayDisplay" class="text-3xl font-mono font-bold">00d 00h 00m 00s</div>
+                <p id="nextMondayDate" class="text-[10px] text-slate-500 mt-2 font-mono"></p>
+            </div>
         </div>
     </div>
 
@@ -223,6 +246,38 @@
             const now = new Date();
             document.getElementById('liveClock').textContent = now.toLocaleTimeString();
             document.getElementById('liveDate').textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            checkNightMode(now);
+        }
+
+        function checkNightMode(now) {
+            const currentHour = now.getHours();
+            const overlay = document.getElementById('nightOverlay');
+            
+            // Trigger sharp at 11:00 PM (23:00) until 12:00 AM (00:00)
+            if (currentHour >= 23) {
+                overlay.style.display = "flex";
+                document.getElementById('mainContent').style.filter = "blur(20px)";
+                
+                // Calculate next Monday at midnight
+                const nextMonday = new Date(now);
+                nextMonday.setDate(now.getDate() + ((7 - now.getDay() + 1) % 7 || 7));
+                nextMonday.setHours(0, 0, 0, 0);
+                
+                const diff = nextMonday.getTime() - now.getTime();
+                
+                const d = Math.floor(diff / 86400000);
+                const h = Math.floor((diff % 86400000) / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                
+                document.getElementById('nextMondayDisplay').textContent = 
+                    `${d}d ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+                document.getElementById('nextMondayDate').textContent = `NEXT ROTATION: ${nextMonday.toDateString()}`;
+            } else {
+                overlay.style.display = "none";
+                document.getElementById('mainContent').style.filter = "none";
+            }
         }
 
         function updateCountdown() {
@@ -239,7 +294,7 @@
             const h = Math.floor((distance % 86400000) / 3600000);
             const m = Math.floor((distance % 3600000) / 60000);
             const s = Math.floor((distance % 60000) / 1000);
-            const ms = Math.floor((distance % 1000) / 10); // Display 2 digits (0-99)
+            const ms = Math.floor((distance % 1000) / 10);
 
             document.getElementById("days").textContent = String(d).padStart(2, '0');
             document.getElementById("hours").textContent = String(h).padStart(2, '0');
@@ -306,7 +361,6 @@
             renderSchedule();
             updateClock();
             setInterval(updateClock, 1000);
-            // Increased frequency to 10ms for smooth millisecond updates
             setInterval(updateCountdown, 10);
         };
     </script>
