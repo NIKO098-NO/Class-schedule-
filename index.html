@@ -107,8 +107,8 @@
     <div id="nightOverlay">
         <div class="p-8">
             <h1 class="text-5xl md:text-7xl mb-6">🌙</h1>
-            <h2 class="text-3xl md:text-5xl font-black mb-4 italic uppercase"> Sorry but the schedule is updating for next week Monday </h2>
-            <p class="text-xl md:text-2xl font-bold text-slate-400 uppercase tracking-widest mb-8">Sorry for the inconvenience this may cause</p>
+            <h2 class="text-3xl md:text-5xl font-black mb-4 italic uppercase">Wait for next schedule</h2>
+            <p class="text-xl md:text-2xl font-bold text-slate-400 uppercase tracking-widest mb-8">System is updating for Monday</p>
             
             <div class="bg-white/10 p-6 rounded-2xl border border-white/20 inline-block">
                 <p class="text-xs uppercase tracking-[0.2em] text-blue-400 mb-2">Next Rotation Starts In:</p>
@@ -252,16 +252,28 @@
 
         function checkNightMode(now) {
             const currentHour = now.getHours();
+            const currentDay = now.getDay(); // 0 is Sunday, 1 is Monday, 5 is Friday, 6 is Saturday
             const overlay = document.getElementById('nightOverlay');
             
-            // Trigger sharp at 11:00 PM (23:00) until 12:00 AM (00:00)
-            if (currentHour >= 23) {
+            // ACTIVATE if it is 11 PM or later on ANY day, 
+            // OR if it is currently Saturday (6) or Sunday (0)
+            const isLateNight = currentHour >= 23 || currentHour < 6; // Active from 11 PM to 6 AM
+            const isWeekend = currentDay === 6 || currentDay === 0;
+
+            if (isLateNight || isWeekend) {
                 overlay.style.display = "flex";
                 document.getElementById('mainContent').style.filter = "blur(20px)";
                 
-                // Calculate next Monday at midnight
+                // Calculate next Monday at 00:00:00
                 const nextMonday = new Date(now);
-                nextMonday.setDate(now.getDate() + ((7 - now.getDay() + 1) % 7 || 7));
+                // Calculate days to next Monday (target day 1)
+                let daysUntilMonday = (1 - currentDay + 7) % 7;
+                // If it's already Monday, we want the next one (unless it's early morning)
+                if (daysUntilMonday === 0 && (currentHour >= 23 || currentDay === 1)) {
+                    daysUntilMonday = 7;
+                }
+                
+                nextMonday.setDate(now.getDate() + daysUntilMonday);
                 nextMonday.setHours(0, 0, 0, 0);
                 
                 const diff = nextMonday.getTime() - now.getTime();
