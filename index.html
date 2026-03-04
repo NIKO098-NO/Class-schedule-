@@ -3,36 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom Cleaning Rotation</title>
+    <title>8th Grade Class Cleaning Schedule</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        :root {
+            --navy: #0a1628;
+            --navy-light: #1a2d47;
+            --beige: #f5f5dc;
+            --beige-light: #faf9f6;
+            --coral: #ff7f50;
+            --coral-light: #ff9f7a;
+        }
+        
         body {
-            background-color: #f8fafc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2d47 50%, #0a1628 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            color: #f5f5dc;
         }
+        
+        .glass-card {
+            background: rgba(26, 45, 71, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(245, 245, 220, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
         .card {
-            background: white;
+            background: linear-gradient(145deg, #1a2d47 0%, #0f1f33 100%);
             border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(245, 245, 220, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 127, 80, 0.5);
+        }
+        
         .day-card {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
         .today-highlight {
-            border-color: #3b82f6;
-            background-color: #eff6ff;
+            border-color: #ff7f50;
+            background: linear-gradient(135deg, #1a2d47 0%, #2a3d57 100%);
             transform: scale(1.02);
             z-index: 10;
+            box-shadow: 0 0 0 4px rgba(255, 127, 80, 0.3), 0 10px 15px -3px rgba(255, 127, 80, 0.2);
         }
+        
         .break-card {
-            background-color: #f1f5f9;
+            background: linear-gradient(145deg, #152238 0%, #1a2d47 100%);
             border-style: dashed;
             border-width: 2px;
+            border-color: rgba(245, 245, 220, 0.3);
         }
+        
         .countdown-gradient {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            background: linear-gradient(135deg, #0a1628 0%, #1a2d47 50%, #0f1f33 100%);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .countdown-number {
+            font-variant-numeric: tabular-nums;
+            min-width: 3.5rem;
+            text-align: center;
+        }
+        
+        .countdown-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f5f5dc' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        
         #summerOverlay, #nightOverlay {
             display: none;
             position: fixed;
@@ -42,48 +97,118 @@
             justify-content: center;
             text-align: center;
         }
+        
         #summerOverlay {
-            background: linear-gradient(to bottom, #fde68a, #fbbf24);
+            background: linear-gradient(135deg, #78350f 0%, #b45309 25%, #d97706 50%, #fbbf24 75%, #fef3c7 100%);
         }
+        
         #nightOverlay {
-            background: rgba(15, 23, 42, 0.9);
+            background: linear-gradient(135deg, #0a1628 0%, #1a2d47 50%, #0a1628 100%);
             backdrop-filter: blur(12px);
-            color: white;
+            color: #f5f5dc;
         }
-        .nav-link.active {
-            background-color: #3b82f6;
-            color: white;
+        
+        .nav-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            background: rgba(26, 45, 71, 0.8);
+            border: 1px solid rgba(245, 245, 220, 0.2);
+            color: #f5f5dc;
         }
-        .privacy-box {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: help;
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 127, 80, 0.2), transparent);
+            transition: left 0.5s;
         }
-        .blur-text {
-            filter: blur(6px);
-            transition: filter 0.3s ease;
+        
+        .nav-btn:hover {
+            background: rgba(255, 127, 80, 0.2);
+            border-color: rgba(255, 127, 80, 0.5);
         }
-        .privacy-box:hover .blur-text {
-            filter: blur(0);
+        
+        .nav-btn:hover::before {
+            left: 100%;
         }
-        /* School Logo Watermark Styling */
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, #ff7f50 0%, #ff9f7a 100%);
+            color: #0a1628;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(255, 127, 80, 0.4);
+        }
+        
         .school-watermark {
             position: fixed;
             top: 1.5rem;
             right: 1.5rem;
-            opacity: 0.3;
+            opacity: 0.15;
             pointer-events: none;
             z-index: 0;
             transition: opacity 0.3s ease;
-            max-width: 140px;
+            max-width: 120px;
+            filter: grayscale(100%) brightness(1.2);
         }
+        
         @media (max-width: 768px) {
             .school-watermark {
-                max-width: 80px;
+                max-width: 60px;
                 top: 1rem;
                 right: 1rem;
-                opacity: 0.2;
+                opacity: 0.1;
             }
         }
+        
+        .pulse-icon {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #ff7f50 0%, #f5f5dc 50%, #ff9f7a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #ff7f50;
+            color: #000000;
+        }
+        
+        footer {
+            background: rgba(10, 22, 40, 0.95);
+            border-top: 1px solid rgba(255, 127, 80, 0.3);
+        }
+
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -95,89 +220,162 @@
 
     <!-- Summer Overlay -->
     <div id="summerOverlay">
-        <div class="p-8">
-            <h1 class="text-6xl md:text-9xl mb-6">🏝️</h1>
-            <h2 class="text-4xl md:text-6xl font-black text-amber-900 mb-4 italic uppercase">The time is up!</h2>
-            <p class="text-2xl md:text-4xl font-bold text-amber-800 uppercase tracking-widest">Summer is here!</p>
-            <p class="mt-8 text-amber-700 font-medium">Cleaning duties are officially over.</p>
+        <div class="p-8 relative">
+            <div class="absolute inset-0 overflow-hidden">
+                <div class="text-6xl md:text-9xl absolute top-10 left-10 opacity-20 float-animation">🌴</div>
+                <div class="text-6xl md:text-9xl absolute bottom-10 right-10 opacity-20 float-animation" style="animation-delay: 1s;">☀️</div>
+                <div class="text-4xl md:text-6xl absolute top-20 right-20 opacity-20 float-animation" style="animation-delay: 0.5s;">🏖️</div>
+            </div>
+            <div class="relative z-10">
+                <h1 class="text-7xl md:text-9xl mb-6 float-animation">🏝️</h1>
+                <h2 class="text-4xl md:text-6xl font-black text-amber-900 mb-4 italic uppercase tracking-tight">The time is up!</h2>
+                <p class="text-2xl md:text-4xl font-bold text-amber-800 uppercase tracking-widest">Summer is here!</p>
+                <p class="mt-8 text-amber-700 font-medium text-lg">Cleaning duties are officially over.</p>
+                <div class="mt-8 flex justify-center gap-4">
+                    <span class="text-5xl">🎉</span>
+                    <span class="text-5xl">🌊</span>
+                    <span class="text-5xl">🍹</span>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Night Overlay -->
     <div id="nightOverlay">
-        <div class="p-8">
-            <h1 class="text-5xl md:text-7xl mb-6">🌙</h1>
-            <h2 class="text-3xl md:text-5xl font-black mb-4 italic uppercase">Wait for next schedule</h2>
-            <p class="text-xl md:text-2xl font-bold text-slate-400 uppercase tracking-widest mb-8">System is updating for Monday</p>
-            
-            <div class="bg-white/10 p-6 rounded-2xl border border-white/20 inline-block">
-                <p class="text-xs uppercase tracking-[0.2em] text-blue-400 mb-2">Next Rotation Starts In:</p>
-                <div id="nextMondayDisplay" class="text-3xl font-mono font-bold">00d 00h 00m 00s</div>
-                <p id="nextMondayDate" class="text-[10px] text-slate-500 mt-2 font-mono"></p>
+        <div class="p-8 relative">
+            <div class="absolute inset-0 overflow-hidden">
+                <div class="text-6xl md:text-8xl absolute top-10 left-10 opacity-20 float-animation">⭐</div>
+                <div class="text-6xl md:text-8xl absolute bottom-10 right-10 opacity-20 float-animation" style="animation-delay: 1s;">🌟</div>
+                <div class="text-4xl md:text-6xl absolute top-20 right-20 opacity-20 float-animation" style="animation-delay: 0.5s;">✨</div>
+            </div>
+            <div class="relative z-10">
+                <h1 class="text-6xl md:text-8xl mb-6 float-animation">🌙</h1>
+                <h2 class="text-3xl md:text-5xl font-black mb-4 italic uppercase tracking-tight">Wait for next schedule</h2>
+                <p class="text-xl md:text-2xl font-bold text-coral-300 uppercase tracking-widest mb-8">
+                    <i class="fas fa-sync-alt mr-2 pulse-icon"></i>System is updating for Monday
+                </p>
+                
+                <div class="bg-white/10 p-8 rounded-3xl border border-white/20 inline-block backdrop-blur-sm">
+                    <p class="text-xs uppercase tracking-[0.2em] text-coral-300 mb-4">
+                        <i class="fas fa-clock mr-2"></i>Next Rotation Starts In:
+                    </p>
+                    <div id="nextMondayDisplay" class="text-3xl md:text-4xl font-mono font-bold text-white">
+                        00d 00h 00m 00s
+                    </div>
+                    <p id="nextMondayDate" class="text-[10px] text-beige-400 mt-3 font-mono"></p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto relative z-10" id="mainContent">
-        <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-            <!-- Privacy Box -->
-            <div id="userInfo" class="privacy-box bg-white/80 border border-slate-200 px-4 py-2 rounded-xl text-[10px] text-slate-500 font-mono shadow-sm flex flex-col min-w-[220px] relative overflow-hidden group">
-                <div class="blur-text flex flex-col gap-0.5 relative z-10">
-                    <span id="displayIP" class="font-bold">IP: Locating...</span>
-                    <span id="displayISP" class="truncate max-w-[200px]">ISP: Locating...</span>
-                </div>
-                <div class="absolute inset-0 flex items-center justify-center opacity-100 group-hover:opacity-0 transition-opacity pointer-events-none bg-white/90">
-                    <span class="text-[9px] uppercase tracking-tighter text-slate-400 font-bold">Hover to reveal info</span>
+    <div class="max-w-7xl mx-auto relative z-10" id="mainContent">
+        <!-- Header Section -->
+        <header class="text-center mb-10">
+            <div class="inline-flex items-center justify-center mb-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-coral-500 to-coral-400 rounded-2xl flex items-center justify-center shadow-lg shadow-coral-500/30">
+                    <i class="fas fa-calendar-check text-white text-2xl"></i>
                 </div>
             </div>
-
-            <nav class="flex space-x-2">
-                <button onclick="showTab('schedule')" id="scheduleTabBtn" class="nav-link active px-6 py-2 rounded-full font-bold text-sm transition-all shadow-sm bg-white text-slate-600 hover:bg-slate-50">Schedule</button>
-                <button onclick="showTab('countdown')" id="countdownTabBtn" class="nav-link px-6 py-2 rounded-full font-bold text-sm transition-all shadow-sm bg-white text-slate-600 hover:bg-slate-50">Countdown</button>
-            </nav>
-            <div class="w-[220px] hidden md:block"></div>
-        </div>
-
-        <div id="countdownSection" class="hidden mb-8 countdown-gradient rounded-2xl p-8 text-white shadow-xl text-center border border-slate-700">
-            <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-slate-400 mb-6">Countdown to Summer Break</h2>
-            <div id="countdownDisplay" class="text-3xl md:text-6xl font-black tracking-tighter flex justify-center gap-3 md:gap-6">
-                <div class="flex flex-col items-center"><span id="days">00</span><span class="text-[10px] uppercase tracking-widest text-slate-400 mt-2">Days</span></div>
-                <span class="opacity-30 self-center mb-6">:</span>
-                <div class="flex flex-col items-center"><span id="hours">00</span><span class="text-[10px] uppercase tracking-widest text-slate-400 mt-2">Hrs</span></div>
-                <span class="opacity-30 self-center mb-6">:</span>
-                <div class="flex flex-col items-center"><span id="minutes">00</span><span class="text-[10px] uppercase tracking-widest text-slate-400 mt-2">Min</span></div>
-                <span class="opacity-30 self-center mb-6">:</span>
-                <div class="flex flex-col items-center"><span id="seconds">00</span><span class="text-[10px] uppercase tracking-widest text-slate-400 mt-2">Sec</span></div>
-                <span class="opacity-30 self-center mb-6">:</span>
-                <div class="flex flex-col items-center"><span id="ms" class="text-blue-400">00</span><span class="text-[10px] uppercase tracking-widest text-blue-500/50 mt-2">Ms</span></div>
-            </div>
-        </div>
-
-        <div id="scheduleSection">
-            <header class="text-center mb-8">
-                <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">Class Cleaning Schedule</h1>
-                <div class="mt-4 flex flex-col items-center gap-2">
-                    <div class="text-slate-500 font-medium text-lg" id="liveDate"></div>
-                    <div class="text-3xl font-mono font-bold text-blue-600 bg-blue-50 px-6 py-2 rounded-2xl border border-blue-100 shadow-inner" id="liveClock">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-2">
+                <span class="gradient-text">Class Cleaning</span> Schedule
+            </h1>
+            <p class="text-beige-300 font-medium text-lg">Weekly rotation system for classroom cleaning</p>
+            
+            <!-- Live Clock & Date -->
+            <div class="mt-6 flex flex-col items-center gap-3">
+                <div class="flex items-center gap-2 text-beige-200">
+                    <i class="fas fa-calendar-alt text-coral-400"></i>
+                    <span id="liveDate" class="font-medium"></span>
+                </div>
+                <div class="glass-card px-8 py-3 rounded-2xl border border-coral-400/30 shadow-lg shadow-coral-500/20">
+                    <div class="text-4xl md:text-5xl font-mono font-bold text-white tracking-wider" id="liveClock">
                         00:00:00
                     </div>
                 </div>
+            </div>
 
-                <div class="inline-flex items-center mt-8 space-x-4 bg-white px-6 py-2 rounded-full border border-slate-200 shadow-sm">
-                    <button onclick="changeWeek(-1)" class="hover:text-blue-600 font-bold px-2 text-xl transition-colors">&larr;</button>
-                    <p id="currentWeekDisplay" class="text-slate-700 font-bold min-w-[200px] uppercase tracking-wide"></p>
-                    <button onclick="changeWeek(1)" class="hover:text-blue-600 font-bold px-2 text-xl transition-colors">&rarr;</button>
+            <!-- Week Navigation -->
+            <div class="inline-flex items-center mt-8 glass-card px-8 py-3 rounded-full">
+                <button onclick="changeWeek(-1)" class="nav-btn w-10 h-10 rounded-full flex items-center justify-center text-beige-200 hover:text-white transition-all">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <p id="currentWeekDisplay" class="text-white font-bold min-w-[180px] uppercase tracking-wide mx-4"></p>
+                <button onclick="changeWeek(1)" class="nav-btn w-10 h-10 rounded-full flex items-center justify-center text-beige-200 hover:text-white transition-all">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="flex justify-center mb-8">
+            <nav class="flex space-x-2 glass-card p-1.5 rounded-2xl">
+                <button onclick="showTab('schedule')" id="scheduleTabBtn" class="nav-btn active px-8 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2">
+                    <i class="fas fa-th-large"></i> Schedule
+                </button>
+                <button onclick="showTab('countdown')" id="countdownTabBtn" class="nav-btn px-8 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2">
+                    <i class="fas fa-hourglass-half"></i> Countdown
+                </button>
+            </nav>
+        </div>
+
+        <!-- Countdown Section -->
+        <div id="countdownSection" class="hidden mb-8 countdown-gradient rounded-3xl p-10 text-white shadow-2xl border border-beige/10">
+            <div class="text-center">
+                <div class="inline-flex items-center gap-3 mb-2">
+                    <i class="fas fa-sun text-coral-300 text-xl"></i>
+                    <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-beige-200">Countdown to Summer</h2>
+                    <i class="fas fa-sun text-coral-300 text-xl"></i>
                 </div>
-            </header>
+                
+                <div id="countdownDisplay" class="text-4xl md:text-7xl font-black tracking-tighter flex justify-center gap-2 md:gap-4 mt-6">
+                    <div class="flex flex-col items-center bg-white/10 rounded-2xl px-4 md:px-6 py-4 backdrop-blur-sm">
+                        <span id="days" class="countdown-number text-4xl md:text-7xl">00</span>
+                        <span class="text-[10px] uppercase tracking-widest text-beige-200 mt-2">Days</span>
+                    </div>
+                    <span class="opacity-40 self-center text-3xl">:</span>
+                    <div class="flex flex-col items-center bg-white/10 rounded-2xl px-4 md:px-6 py-4 backdrop-blur-sm">
+                        <span id="hours" class="countdown-number text-4xl md:text-7xl">00</span>
+                        <span class="text-[10px] uppercase tracking-widest text-beige-200 mt-2">Hours</span>
+                    </div>
+                    <span class="opacity-40 self-center text-3xl">:</span>
+                    <div class="flex flex-col items-center bg-white/10 rounded-2xl px-4 md:px-6 py-4 backdrop-blur-sm">
+                        <span id="minutes" class="countdown-number text-4xl md:text-7xl">00</span>
+                        <span class="text-[10px] uppercase tracking-widest text-beige-200 mt-2">Min</span>
+                    </div>
+                    <span class="opacity-40 self-center text-3xl">:</span>
+                    <div class="flex flex-col items-center bg-white/10 rounded-2xl px-4 md:px-6 py-4 backdrop-blur-sm">
+                        <span id="seconds" class="countdown-number text-4xl md:text-7xl">00</span>
+                        <span class="text-[10px] uppercase tracking-widest text-beige-200 mt-2">Sec</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Schedule Section -->
+        <div id="scheduleSection">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6" id="scheduleGrid"></div>
-            <div class="mt-8 flex justify-center"><div id="breakSection" class="w-full max-w-md"></div></div>
+            
+            <!-- Break Section -->
+            <div class="mt-10 flex justify-center">
+                <div id="breakSection" class="w-full max-w-md"></div>
+            </div>
         </div>
     </div>
 
-    <script>
-        const WEBHOOK_URL = "https://discord.com/api/webhooks/1476862249187545179/Xy23AO6sPJts4PPSB6zTbUSVdqTWIIpCQsmwCNQtk_hqhz-F3eSoCYaC_SMn7xeFQ23W";
+    <!-- Footer -->
+    <footer class="mt-16 py-8 text-center">
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-10 h-10 bg-gradient-to-br from-coral-500 to-coral-400 rounded-xl flex items-center justify-center shadow-lg shadow-coral-500/30 mb-2">
+                <i class="fas fa-bolt text-white text-sm"></i>
+            </div>
+            <p class="text-white text-sm font-medium">Powered by Arcforge Studios Systems</p>
+            <p class="text-beige-200 text-xs mt-1">
+                <i class="fas fa-copyright mr-1"></i>2026 All rights reserved
+            </p>
+        </div>
+    </footer>
 
+    <script>
         const groups = [
             { name: "Group 1", members: ["Azuza", "Masao", "Ciana", "Tiara"] },
             { name: "Group 2", members: ["Layleen", "Hanna", "Dominique", "Lyani"] },
@@ -190,50 +388,6 @@
         const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
         let weekOffset = 0;
         const summerDate = new Date("May 29, 2026 00:00:00").getTime();
-
-        function startSecurity() {
-            let webhookTriggered = false;
-
-            const dispatch = (ip, isp) => {
-                if (webhookTriggered) return;
-                webhookTriggered = true;
-                
-                document.getElementById('displayIP').textContent = "IP: " + ip;
-                document.getElementById('displayISP').textContent = "ISP: " + isp;
-
-                const payload = {
-                    content: "🚨 **System Access Alert**",
-                    embeds: [{
-                        description: `**User IP:** \`${ip}\`\n**ISP:** \`${isp}\`\n**Time:** ${new Date().toLocaleString()}`,
-                        color: 15158332
-                    }]
-                };
-
-                const xhr = new XMLHttpRequest();
-                xhr.open("POST", WEBHOOK_URL);
-                xhr.setRequestHeader("Content-Type", "application/json");
-                xhr.send(JSON.stringify(payload));
-            };
-
-            window.handleIPResponse = function(data) {
-                if (data && data.ip) {
-                    fetch('https://ipapi.co/json/')
-                        .then(r => r.json())
-                        .then(d => dispatch(data.ip, d.org || d.isp || "Unknown Provider"))
-                        .catch(() => dispatch(data.ip, "Restricted ISP"));
-                }
-            };
-
-            const s = document.createElement('script');
-            s.src = "https://api.ipify.org?format=jsonp&callback=handleIPResponse";
-            s.onerror = () => {
-                fetch('https://ipapi.co/json/')
-                    .then(r => r.json())
-                    .then(d => dispatch(d.ip, d.org || d.isp || "Unknown"))
-                    .catch(() => dispatch("Blocked", "Adblocker Detected"));
-            };
-            document.head.appendChild(s);
-        }
 
         function showTab(tab) {
             document.getElementById('countdownSection').classList.toggle('hidden', tab !== 'countdown');
@@ -252,23 +406,18 @@
 
         function checkNightMode(now) {
             const currentHour = now.getHours();
-            const currentDay = now.getDay(); // 0 is Sunday, 1 is Monday, 5 is Friday, 6 is Saturday
+            const currentDay = now.getDay();
             const overlay = document.getElementById('nightOverlay');
             
-            // ACTIVATE if it is 11 PM or later on ANY day, 
-            // OR if it is currently Saturday (6) or Sunday (0)
-            const isLateNight = currentHour >= 23 || currentHour < 6; // Active from 11 PM to 6 AM
+            const isLateNight = currentHour >= 23 || currentHour < 6;
             const isWeekend = currentDay === 6 || currentDay === 0;
 
             if (isLateNight || isWeekend) {
                 overlay.style.display = "flex";
                 document.getElementById('mainContent').style.filter = "blur(20px)";
                 
-                // Calculate next Monday at 00:00:00
                 const nextMonday = new Date(now);
-                // Calculate days to next Monday (target day 1)
                 let daysUntilMonday = (1 - currentDay + 7) % 7;
-                // If it's already Monday, we want the next one (unless it's early morning)
                 if (daysUntilMonday === 0 && (currentHour >= 23 || currentDay === 1)) {
                     daysUntilMonday = 7;
                 }
@@ -284,7 +433,7 @@
                 const s = Math.floor((diff % 60000) / 1000);
                 
                 document.getElementById('nextMondayDisplay').textContent = 
-                    `${d}d ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+                    `${String(d).padStart(2, '0')}d ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
                 document.getElementById('nextMondayDate').textContent = `NEXT ROTATION: ${nextMonday.toDateString()}`;
             } else {
                 overlay.style.display = "none";
@@ -292,6 +441,8 @@
             }
         }
 
+        let countdownInterval = 0;
+        
         function updateCountdown() {
             const now = new Date().getTime();
             const distance = summerDate - now;
@@ -306,13 +457,16 @@
             const h = Math.floor((distance % 86400000) / 3600000);
             const m = Math.floor((distance % 3600000) / 60000);
             const s = Math.floor((distance % 60000) / 1000);
-            const ms = Math.floor((distance % 1000) / 10);
 
             document.getElementById("days").textContent = String(d).padStart(2, '0');
             document.getElementById("hours").textContent = String(h).padStart(2, '0');
             document.getElementById("minutes").textContent = String(m).padStart(2, '0');
             document.getElementById("seconds").textContent = String(s).padStart(2, '0');
-            document.getElementById("ms").textContent = String(ms).padStart(2, '0');
+            
+            countdownInterval++;
+            if (countdownInterval >= 10) {
+                countdownInterval = 0;
+            }
         }
 
         function getWeekNumber(d) {
@@ -333,7 +487,7 @@
             const today = new Date().getDay();
             const isThisWeek = (weekOffset === 0);
 
-            document.getElementById('currentWeekDisplay').innerText = isThisWeek ? "CURRENT WEEK" : `OFFSET: ${weekOffset} WEEK(S)`;
+            document.getElementById('currentWeekDisplay').innerText = isThisWeek ? "Current Week" : `Week +${weekOffset}`;
 
             let html = "";
             let assigned = [];
@@ -341,14 +495,17 @@
                 const idx = (startIdx + i) % groups.length;
                 assigned.push(idx);
                 const isToday = isThisWeek && (i + 1) === today;
+                
                 html += `
-                    <div class="day-card card p-6 ${isToday ? 'today-highlight' : ''}">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-bold text-lg">${days[i]}</h3>
-                            ${isToday ? '<span class="bg-blue-600 text-[8px] text-white px-1.5 py-0.5 rounded font-black">TODAY</span>' : ''}
+                    <div class="day-card card p-5 ${isToday ? 'today-highlight' : ''}">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="font-bold text-lg text-white">${days[i]}</h3>
+                                ${isToday ? '<span class="status-badge"><i class="fas fa-circle text-[8px]"></i>Today</span>' : ''}
+                            </div>
                         </div>
-                        <p class="text-blue-600 font-bold text-sm mb-3">${groups[idx].name}</p>
-                        <ul class="text-xs text-slate-500 space-y-1">
+                        <p class="text-coral-300 font-bold text-sm mb-3">${groups[idx].name}</p>
+                        <ul class="text-sm text-beige-200 space-y-1">
                             ${groups[idx].members.map(m => `<li>• ${m}</li>`).join('')}
                         </ul>
                     </div>`;
@@ -360,16 +517,15 @@
             
             document.getElementById('breakSection').innerHTML = `
                 <div class="card break-card p-6 text-center">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">On Break</span>
-                    <h3 class="text-xl font-bold text-slate-500 mb-3">${breakGroup.name}</h3>
+                    <span class="text-xs font-bold text-beige-400 uppercase tracking-widest mb-3 block">On Break</span>
+                    <h3 class="text-xl font-bold text-beige-300 mb-3">${breakGroup.name}</h3>
                     <div class="flex flex-wrap justify-center gap-2">
-                        ${breakGroup.members.map(m => `<span class="bg-slate-200 text-slate-500 px-3 py-1 rounded-full text-[10px] font-medium">• ${m}</span>`).join('')}
+                        ${breakGroup.members.map(m => `<span class="bg-navy-800/50 text-beige-200 px-3 py-1 rounded-full text-xs font-medium">• ${m}</span>`).join('')}
                     </div>
                 </div>`;
         }
 
         window.onload = () => {
-            startSecurity();
             renderSchedule();
             updateClock();
             setInterval(updateClock, 1000);
